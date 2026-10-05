@@ -44,6 +44,13 @@ function normalizeMainOrders(mainOrders) {
   return out;
 }
 
+// 淘寶嘅圖同連結有時係「//img.alicdn.com/…」，補返 https:
+function httpsUrl(v) {
+  const u = str(v);
+  if (u.startsWith('//')) return `https:${u}`;
+  return /^https?:\/\//.test(u) ? u.replace(/^http:/, 'https:') : '';
+}
+
 function yuan(v) {
   return str(v).replace(/[^0-9.]/g, '');
 }
@@ -70,11 +77,16 @@ function normalizeBoughtListV2(json) {
       const item = (c && c.fields && c.fields.item) || {};
       const title = str(item.title);
       if (!title) continue;
-      items.push({
+      const entry = {
         title,
         qty: Number.parseInt(str(item.quantity), 10) || 1,
         price: yuan((item.priceInfo || {}).actualTotalFee),
-      });
+      };
+      const pic = httpsUrl(item.pic);
+      const url = httpsUrl(item.itemUrl || item.outerUrl);
+      if (pic) entry.pic = pic;
+      if (url) entry.url = url;
+      items.push(entry);
     }
     orders.push({ id, time, shop: str(shop.shopName || shop.sellerName), items, paid, status: str(shop.tradeTitle) });
   }
