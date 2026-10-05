@@ -60,7 +60,15 @@ const v2 = {
       orderPayment_900001: { tag: 'orderPayment', fields: { actualFee: { prefix: '实付款', value: '￥194.28' } } },
       orderItemInfo_900001_900002: {
         tag: 'orderItemInfo',
-        fields: { item: { title: '折疊傘', quantity: '1', priceInfo: { actualTotalFee: '￥186.28' } } },
+        fields: {
+          item: {
+            title: '折疊傘',
+            quantity: '1',
+            priceInfo: { actualTotalFee: '￥186.28' },
+            pic: '//img.alicdn.com/imgextra/test.jpg',
+            itemUrl: '//item.taobao.com/item.htm?id=1',
+          },
+        },
       },
       orderItemInfo_900001_900003: {
         tag: 'orderItemInfo',
@@ -81,7 +89,13 @@ test('reads the new bought-list layout and its paging', () => {
       time: '2026-09-22 14:03:55',
       shop: '測試旗艦店',
       items: [
-        { title: '折疊傘', qty: 1, price: '186.28' },
+        {
+          title: '折疊傘',
+          qty: 1,
+          price: '186.28',
+          pic: 'https://img.alicdn.com/imgextra/test.jpg',
+          url: 'https://item.taobao.com/item.htm?id=1',
+        },
         { title: '運費險', qty: 2, price: '8.00' },
       ],
       paid: '194.28',
