@@ -44,9 +44,52 @@ function normalizeMainOrders(mainOrders) {
   return out;
 }
 
+function yuan(v) {
+  return str(v).replace(/[^0-9.]/g, '');
+}
+
+// 新版「已買到的寶貝」（mtop.taobao.order.queryboughtlistV2）：每張訂單拆咗做幾個組件，
+// 用訂單號串返埋：shopInfo_<單號>（時間、店舖、狀態）、orderPayment_<單號>（實付款）、
+// orderItemInfo_<單號>_<子單號>（每件貨）。返回呢頁嘅訂單同分頁資料。
+function normalizeBoughtListV2(json) {
+  const comps = json && json.data && json.data.data;
+  if (!comps || typeof comps !== 'object') return null;
+  const pag = (comps.pagination && comps.pagination.fields) || {};
+  const orders = [];
+  for (const [key, comp] of Object.entries(comps)) {
+    if (!key.startsWith('shopInfo_')) continue;
+    const shop = (comp && comp.fields) || {};
+    const id = str(shop.orderId || key.slice('shopInfo_'.length));
+    const payment = (comps[`orderPayment_${id}`] || {}).fields || {};
+    const paid = yuan((payment.actualFee || {}).value);
+    const time = str(shop.createTime);
+    if (!id || !time || !paid) continue;
+    const items = [];
+    for (const [k, c] of Object.entries(comps)) {
+      if (!k.startsWith(`orderItemInfo_${id}_`)) continue;
+      const item = (c && c.fields && c.fields.item) || {};
+      const title = str(item.title);
+      if (!title) continue;
+      items.push({
+        title,
+        qty: Number.parseInt(str(item.quantity), 10) || 1,
+        price: yuan((item.priceInfo || {}).actualTotalFee),
+      });
+    }
+    orders.push({ id, time, shop: str(shop.shopName || shop.sellerName), items, paid, status: str(shop.tradeTitle) });
+  }
+  return {
+    orders,
+    page: Number.parseInt(str(pag.currentPage), 10) || null,
+    hasMore: pag.hasMore === true || pag.hasMore === 'true',
+    totalNum: Number.parseInt(str(pag.totalNum), 10) || null,
+    pageSize: Number.parseInt(str(pag.pageSize), 10) || null,
+  };
+}
+
 function buildExport(ordersById) {
   const orders = [...ordersById.values()].sort((a, b) => (a.time < b.time ? 1 : -1));
   return { format: MONEY_EXPENSE_FORMAT, version: 1, exportedAt: new Date().toISOString(), orders };
 }
 
-if (typeof module !== 'undefined') module.exports = { normalizeOrder, normalizeMainOrders, buildExport };
+if (typeof module !== 'undefined') module.exports = { normalizeOrder, normalizeMainOrders, normalizeBoughtListV2, buildExport };

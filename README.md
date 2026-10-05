@@ -15,11 +15,12 @@ Chrome extension：將淘寶「已買到的寶貝」嘅訂單匯出做一個 JSO
 ## 每次匯出
 
 1. 用 Chrome 登入淘寶，打開「我的淘寶 › 已買到的寶貝」。
-2. 右下角撳「匯出全部訂單」，等佢逐頁讀完。每頁之間停一兩秒，好似人咁睇。
-3. 撳「下載」，得到 `taobao-orders-日期.json`。
+2. 右下角撳「匯出全部訂單」。extension 會由第一頁開始，自己逐頁撳「下一頁」（每頁之間停 2–4 秒，好似人咁睇），抄低每頁嘅訂單，一直讀到最舊嗰張。大約每 30 張一頁，500 幾張訂單約一分鐘。
+3. 讀完撳「下載」，得到 `taobao-orders-日期.json`。
 4. 將個檔擺上 Google Drive（或者傳去電話），喺 Money Expense 匯入。同一張訂單匯入幾多次都只會記一次。
 
-如果淘寶要你滑動驗證，完成之後再撳一次「匯出全部訂單」；或者自己喺頁面逐頁撳「下一頁」，extension 會照收集，最後撳「下載」。
+淘寶會擋 extension 自己直接問訂單資料，所以 extension 唔會咁做，只係抄低淘寶頁面本身載入嘅資料。
+如果中途淘寶要你滑動驗證，extension 會停低；完成驗證之後撳「繼續」，會由停低嗰頁接住讀。
 
 ## 匯出格式
 
@@ -46,9 +47,9 @@ Chrome extension：將淘寶「已買到的寶貝」嘅訂單匯出做一個 JSO
 ## 檔案
 
 - `manifest.json`：Chrome extension 設定（Manifest V3），只喺 `buyertrade.taobao.com/trade/itemlist/*` 行。
-- `content.js`：右下角嘅掣，逐頁讀訂單同下載。
-- `page_hook.js`：喺淘寶頁面抄低淘寶自己載入嘅訂單，自動轉頁失敗時用。
-- `normalize.js`：將淘寶嘅訂單資料轉做上面嘅格式。
+- `content.js`：右下角嘅掣，自動逐頁撳「下一頁」同下載。
+- `page_hook.js`：喺淘寶頁面抄低淘寶自己載入嘅訂單（`mtop.taobao.order.queryboughtlistV2`）。
+- `normalize.js`：將淘寶嘅訂單資料（新版同舊版）轉做上面嘅格式。
 
 ## 測試
 

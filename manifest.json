@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "淘寶訂單匯出（Money Expense）",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "將「已買到的寶貝」訂單匯出做檔案，再喺 Money Expense 匯入。唔會傳資料去任何地方。",
   "host_permissions": ["https://buyertrade.taobao.com/*"],
   "content_scripts": [

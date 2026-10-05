@@ -1,23 +1,21 @@
-// 「已買到的寶貝」頁面右下角加一個掣：逐頁讀訂單，然後下載一個 JSON 檔俾 Money Expense 匯入。
-// 全部喺你部電腦做，唔會將資料傳去任何地方。
+// 「已買到的寶貝」頁面右下角加一個掣：自動逐頁撳「下一頁」，抄低每頁訂單，然後下載一個 JSON 檔俾 Money Expense 匯入。
+// 全部喺你部電腦做，唔會將資料傳去任何地方。淘寶擋直接問資料，所以照住人咁轉頁。
 
 (() => {
   const collected = new Map(); // 訂單號 → 訂單
-  const PAGE_SIZE = 15;
-  const MAX_PAGES = 200;
+  let lastPage = null; // { page, hasMore, totalNum, pageSize }
+  let waiters = [];
 
-  const addOrders = (data) => {
-    const before = collected.size;
-    for (const o of normalizeMainOrders(data && data.mainOrders)) collected.set(o.id, o);
+  const addOrders = (orders) => {
+    for (const o of orders) collected.set(o.id, o);
     updateCount();
-    return collected.size - before;
   };
 
   // ---- 介面 ----
   const box = document.createElement('div');
   box.style.cssText =
     'position:fixed;right:20px;bottom:20px;z-index:2147483647;background:#111;color:#fff;' +
-    'border-radius:16px;padding:12px 14px;font:14px/1.4 sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.3);max-width:260px';
+    'border-radius:16px;padding:12px 14px;font:14px/1.4 sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.3);max-width:280px';
   const status = document.createElement('div');
   status.style.marginBottom = '8px';
   const run = document.createElement('button');
@@ -33,82 +31,119 @@
   box.append(status, run, save);
   document.body.appendChild(box);
 
-  let busy = false;
+  function totalPages() {
+    if (!lastPage || !lastPage.totalNum || !lastPage.pageSize) return null;
+    return Math.ceil(lastPage.totalNum / lastPage.pageSize);
+  }
+
   function updateCount(note) {
-    status.textContent = note || `Money Expense：已收集 ${collected.size} 張訂單`;
+    const total = lastPage && lastPage.totalNum ? ` / 共 ${lastPage.totalNum}` : '';
+    status.textContent = note || `Money Expense：已收集 ${collected.size}${total} 張訂單`;
   }
   updateCount();
 
   // 淘寶頁面自己載入嘅訂單（見 page_hook.js）
   window.addEventListener('message', (e) => {
     if (e.source !== window || !e.data || e.data.__moneyExpense !== 'orders') return;
+    let json;
     try {
-      addOrders(JSON.parse(e.data.payload));
-    } catch (_) {}
+      json = JSON.parse(e.data.payload);
+    } catch (_) {
+      return;
+    }
+    const v2 = normalizeBoughtListV2(json);
+    if (v2 && (v2.orders.length || v2.page)) {
+      lastPage = v2;
+      addOrders(v2.orders);
+      const ready = waiters;
+      waiters = [];
+      for (const w of ready) w(v2);
+      return;
+    }
+    addOrders(normalizeMainOrders(json && json.mainOrders));
   });
 
   // 喺呢個 script 載入之前淘寶已經載入咗嘅，叫 page_hook.js 再送一次
   window.postMessage({ __moneyExpense: 'replay' }, location.origin);
 
-  // ---- 讀訂單 ----
+  // ---- 轉頁 ----
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  async function decode(res) {
-    const buf = await res.arrayBuffer();
-    const utf8 = new TextDecoder('utf-8').decode(buf);
-    if (!utf8.includes('�')) return utf8;
-    return new TextDecoder('gbk').decode(buf);
-  }
-
-  async function fetchPage(pageNum) {
-    const url =
-      '/trade/itemlist/asyncBought.htm?action=itemlist/BoughtQueryAction&event_submit_do_query=1&_input_charset=utf8';
-    const body = new URLSearchParams({ pageNum: String(pageNum), pageSize: String(PAGE_SIZE), prePageNo: String(Math.max(1, pageNum - 1)) });
-    const res = await fetch(url, {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-      body,
+  /** 等淘寶載入第 [page] 頁；[timeoutMs] 內冇就返回 null（多數係要滑動驗證）。 */
+  function waitForPage(page, timeoutMs) {
+    if (lastPage && lastPage.page === page) return Promise.resolve(lastPage);
+    return new Promise((resolve) => {
+      const timer = setTimeout(() => {
+        waiters = waiters.filter((w) => w !== check);
+        resolve(null);
+      }, timeoutMs);
+      function check(p) {
+        if (p.page !== page) {
+          waiters.push(check);
+          return;
+        }
+        clearTimeout(timer);
+        resolve(p);
+      }
+      waiters.push(check);
     });
-    if (!res.ok) throw new Error(`淘寶回應 ${res.status}`);
-    const text = await decode(res);
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (_) {
-      // 多數係要登入或者滑動驗證
-      throw new Error('淘寶要你驗證身份');
-    }
-    if (!data || !Array.isArray(data.mainOrders)) throw new Error('淘寶冇俾訂單資料');
-    return data;
   }
 
-  run.addEventListener('click', async () => {
+  function clickPager(selector) {
+    const li = document.querySelector(selector);
+    if (!li || li.getAttribute('aria-disabled') === 'true' || li.classList.contains('ant-pagination-disabled')) return false;
+    li.scrollIntoView({ block: 'center' });
+    (li.querySelector('button, a') || li).click();
+    return true;
+  }
+
+  let busy = false;
+  let paused = false;
+
+  async function exportAll(resume) {
     if (busy) return;
     busy = true;
+    paused = false;
     run.disabled = true;
+    run.textContent = '讀緊…';
     try {
-      let total = 1;
-      for (let page = 1; page <= Math.min(total, MAX_PAGES); page++) {
-        updateCount(`讀緊第 ${page}${total > 1 ? ` / ${total}` : ''} 頁…（已收集 ${collected.size} 張）`);
-        const data = await fetchPage(page);
-        addOrders(data);
-        total = Number((data.page || {}).totalPage) || page;
-        if (data.mainOrders.length === 0) break;
+      // 由第一頁開始（「繼續」就由而家嗰頁接住）
+      if (!resume && (!lastPage || lastPage.page !== 1)) {
+        if (!clickPager('.ant-pagination-item-1')) throw new Error('搵唔到第一頁嘅掣，請重新整理頁面');
+        if (!(await waitForPage(1, 8000))) {
+          // 已經喺第一頁但未抄到：轉去第二頁再返嚟
+          if (!clickPager('.ant-pagination-item-2') || !(await waitForPage(2, 20000))) throw new Error('等唔到第一頁');
+          await sleep(1500);
+          clickPager('.ant-pagination-item-1');
+          if (!(await waitForPage(1, 20000))) throw new Error('等唔到第一頁');
+        }
+      }
+      let page = lastPage && lastPage.page ? lastPage.page : 1;
+      while (lastPage && lastPage.hasMore) {
+        const total = totalPages();
+        updateCount(`讀緊第 ${page + 1}${total ? ` / ${total}` : ''} 頁…（已收集 ${collected.size} 張）`);
         // 好似人咁慢慢睇，唔好太密
-        if (page < total) await sleep(1500 + Math.random() * 1500);
+        await sleep(2000 + Math.random() * 2000);
+        if (!clickPager('.ant-pagination-next')) break;
+        const next = await waitForPage(page + 1, 20000);
+        if (!next) {
+          paused = true;
+          throw new Error(`第 ${page + 1} 頁載入唔到：淘寶可能要你滑動驗證。完成後撳「繼續」`);
+        }
+        page = next.page;
       }
       updateCount(`讀完：${collected.size} 張訂單。撳「下載」`);
     } catch (err) {
-      updateCount(
-        `${err.message}。自動讀到 ${collected.size} 張。你可以喺頁面自己逐頁撳「下一頁」，` +
-          'extension 會照收集，之後撳「下載」。',
-      );
+      updateCount(`${err.message}（已收集 ${collected.size} 張）`);
     } finally {
       busy = false;
       run.disabled = false;
+      run.textContent = paused ? '繼續' : '匯出全部訂單';
     }
-  });
+  }
+
+  // 「繼續」：由而家嗰頁接住讀，唔使返去第一頁
+  run.addEventListener('click', () => exportAll(paused && !!lastPage));
 
   save.addEventListener('click', () => {
     if (collected.size === 0) {
