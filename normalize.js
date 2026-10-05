@@ -1,10 +1,40 @@
 // 將淘寶「已買到的寶貝」嘅訂單 JSON（mainOrders）轉做 Money Expense 讀得明嘅格式。
-// 只留記帳要用嘅欄位：訂單號、時間、店舖、商品名、數量、實付款、狀態。冇地址、電話、收件人。
+// 只留記帳要用嘅欄位：訂單號、時間、店舖、商品名、款式、相、數量、實付款、狀態。冇地址、電話、收件人。
 
 const MONEY_EXPENSE_FORMAT = 'money-expense-taobao';
 
 function str(v) {
   return v === undefined || v === null ? '' : String(v).trim();
+}
+
+// 商品相（淘寶 CDN 網址，「//img…」補做 https）
+function picUrl(v) {
+  const u = str(v);
+  if (u.startsWith('//')) return `https:${u}`;
+  return /^https?:\/\//.test(u) ? u.replace(/^http:/, 'https:') : '';
+}
+
+// 款式，例如「颜色分类：黑色；尺码：M」
+function skuText(item) {
+  if (str(item.skuText)) return str(item.skuText);
+  const list = item.skuList || item.skus || (item.skuInfo && item.skuInfo.list);
+  if (Array.isArray(list)) {
+    return list
+      .map((x) => (x && typeof x === 'object' ? [str(x.name), str(x.value)].filter(Boolean).join('：') : str(x)))
+      .filter(Boolean)
+      .join('；');
+  }
+  return str(item.skuInfo && item.skuInfo.text);
+}
+
+// 有先加：相同款式
+function extras(item) {
+  const out = {};
+  const pic = picUrl(item.pic || item.picUrl || item.pictUrl || item.img || item.imgUrl || item.image);
+  if (pic) out.pic = pic;
+  const sku = skuText(item);
+  if (sku) out.sku = sku;
+  return out;
 }
 
 function normalizeOrder(o) {
@@ -23,6 +53,7 @@ function normalizeOrder(o) {
       title,
       qty: Number.parseInt(str(s.quantity), 10) || 1,
       price: str((s.priceInfo || {}).realTotal),
+      ...extras(s.itemInfo || {}),
     });
   }
   return {
@@ -74,6 +105,7 @@ function normalizeBoughtListV2(json) {
         title,
         qty: Number.parseInt(str(item.quantity), 10) || 1,
         price: yuan((item.priceInfo || {}).actualTotalFee),
+        ...extras(item),
       });
     }
     orders.push({ id, time, shop: str(shop.shopName || shop.sellerName), items, paid, status: str(shop.tradeTitle) });

@@ -98,3 +98,18 @@ test('ignores responses that are not a bought list', () => {
   assert.strictEqual(normalizeBoughtListV2({ data: {} }), null);
   assert.strictEqual(normalizeBoughtListV2(null), null);
 });
+
+test('keeps item picture and style when Taobao sends them', () => {
+  const withPic = JSON.parse(JSON.stringify(v2));
+  const item = withPic.data.data.orderItemInfo_900001_900002.fields.item;
+  item.pic = '//img.alicdn.com/bao/uploaded/i1/test.jpg';
+  item.skuList = [{ name: '颜色分类', value: '黑色' }, { name: '尺码', value: 'M' }];
+  const [o] = normalizeBoughtListV2(withPic).orders;
+  assert.strictEqual(o.items[0].pic, 'https://img.alicdn.com/bao/uploaded/i1/test.jpg');
+  assert.strictEqual(o.items[0].sku, '颜色分类：黑色；尺码：M');
+  assert.strictEqual('pic' in o.items[1], false);
+  const [old] = normalizeMainOrders([
+    { ...sample[0], subOrders: [{ itemInfo: { title: '杯', pic: 'http://img.alicdn.com/x.png', skuText: '白色' }, quantity: '1' }] },
+  ]);
+  assert.deepStrictEqual(old.items[0], { title: '杯', qty: 1, price: '', pic: 'https://img.alicdn.com/x.png', sku: '白色' });
+});
