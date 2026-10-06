@@ -26,28 +26,44 @@ Keep the folder where it is: the browser loads the extension from it.
 ## Export your orders
 
 1. Sign in to Taobao and open **我的淘宝 › 已买到的宝贝**.
-2. A black box appears at the bottom right. Click **Export all orders**.
-   The extension goes back to page 1 and clicks "next page" by itself, pausing 2–4 seconds per page like a
-   person reading. About 30 orders per page, so 500 orders take about a minute.
-3. When it says it's done, click **Download Excel** or **Download JSON**.
+2. Click **Export all orders**: next to Taobao's own 导出订单 button, or the orange button at the bottom right.
+3. A dialog like Taobao's own opens. Choose:
+   - **Fields**: order no., order time, status, shop, paid, shipping, total price, discount, item, variant,
+     quantity, amount, item page link, picture link (remembered for next time).
+   - **Which orders**: all orders back to the oldest, the first *N* pages, or orders placed between two dates.
+     You can also leave out closed / cancelled orders (交易关闭).
+   - **Format**: Excel (.xlsx) or JSON.
+4. Click **Export**. The extension goes back to page 1 and clicks "next page" by itself, pausing 2–4 seconds
+   per page like a person reading, then downloads the file. About 30 orders per page, so 500 orders take
+   about a minute. For a date range it stops as soon as it has passed the start date.
 
 If Taobao asks you to slide to verify partway through, the extension stops. Finish the check, then click
-**Continue** to carry on from that page.
+**Continue** to carry on from that page. **Stop** ends the run early.
 
 Taobao blocks extensions that request order data directly, so this one doesn't: it only copies the data the
 page itself loads as it turns the pages.
 
+### Compared with Taobao's own 导出订单
+
+| | Taobao 导出订单 | This extension |
+| --- | --- | --- |
+| How many orders | up to 10 pages per export | all orders, the first *N* pages, or a date range |
+| Formats | Excel | Excel or JSON |
+| Rows of a multi-item order | only the first row has order no., time, shop… | every row keeps them |
+| Amounts | text like "￥26.80" | numbers you can sum |
+| Pictures | no | picture link per item |
+
 ## Excel file
 
-`taobao-orders-<date>.xlsx` has two sheets:
+`taobao-orders-<date>.xlsx` has up to two sheets, with only the fields you picked:
 
 | Sheet | One row per | Columns |
 | --- | --- | --- |
-| Orders | order | order no., order time, shop, status, items, qty, paid (¥) |
-| Items | item | order no., order time, shop, item, qty, amount (¥), picture link, item page link |
+| Orders | order | the order fields you picked, plus items and total quantity |
+| Items | item | order no., time, status and shop (if picked), then the item fields you picked |
 
-"Paid" appears once per order, so you can sum the Orders sheet safely. Order numbers are kept as text so Excel
-doesn't round them. The header row is frozen and has filters.
+Money appears once per order on the Orders sheet, so you can sum it safely. Order numbers are kept as text so
+Excel doesn't round them. Each header row is frozen and has filters.
 
 ## JSON file
 
@@ -90,8 +106,12 @@ doesn't round them. The header row is frozen and has filters.
 **安装：** 下载本仓库（Code › Download ZIP）并解压，打开 `chrome://extensions`（Brave 用 `brave://extensions`），
 开启右上角「开发者模式」，点「加载已解压的扩展程序」，选有 `manifest.json` 的文件夹。
 
-**导出：** 登录淘宝，打开「我的淘宝 › 已买到的宝贝」，点右下角「导出全部订单」，读完后点「下载 Excel」或「下载 JSON」。
-如果中途要滑动验证，完成后点「继续」。
+**导出：** 登录淘宝，打开「我的淘宝 › 已买到的宝贝」，点淘宝「导出订单」旁边（或右下角）的「导出全部订单」。
+像淘宝自己的导出一样选：要导出的字段、订单范围（全部订单／前 N 页／下单日期）、是否不导出交易关闭的订单、
+格式（Excel 或 JSON），然后点「导出」。扩展会自己逐页翻，读完自动下载。如果中途要滑动验证，完成后点「继续」。
+
+**比淘宝自带的导出好在哪：** 不限 10 页；可选 JSON；同一张订单的每行商品都带订单号、时间、店铺；金额是数字，可以直接加总；
+每件商品有图片链接。
 
 本扩展与淘宝、阿里巴巴无关。
 

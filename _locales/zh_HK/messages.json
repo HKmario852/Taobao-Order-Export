@@ -152,5 +152,83 @@
   },
   "open": {
     "message": "開啟"
+  },
+  "dialogTitle": {
+    "message": "匯出訂單"
+  },
+  "fieldsTitle": {
+    "message": "匯出訂單欄位"
+  },
+  "sku": {
+    "message": "型號款式"
+  },
+  "postFee": {
+    "message": "運費"
+  },
+  "total": {
+    "message": "總價"
+  },
+  "discount": {
+    "message": "優惠"
+  },
+  "rangeTitle": {
+    "message": "訂單範圍"
+  },
+  "rangeAll": {
+    "message": "全部訂單（一直到最早一張）"
+  },
+  "rangePages": {
+    "message": "前"
+  },
+  "pagesUnit": {
+    "message": "頁（每頁 30 張訂單）"
+  },
+  "rangeDates": {
+    "message": "下單日期"
+  },
+  "dateTo": {
+    "message": "至"
+  },
+  "skipClosed": {
+    "message": "不匯出交易關閉的訂單"
+  },
+  "formatTitle": {
+    "message": "檔案格式"
+  },
+  "formatXlsx": {
+    "message": "Excel（.xlsx）"
+  },
+  "formatJson": {
+    "message": "JSON"
+  },
+  "jsonNote": {
+    "message": "JSON 會包含全部欄位。"
+  },
+  "start": {
+    "message": "匯出"
+  },
+  "cancel": {
+    "message": "取消"
+  },
+  "stop": {
+    "message": "停止"
+  },
+  "pickField": {
+    "message": "請至少選擇一個欄位。"
+  },
+  "noneMatch": {
+    "message": "沒有符合條件的訂單。"
+  },
+  "badDates": {
+    "message": "請選擇開始和結束日期。"
+  },
+  "stopped": {
+    "message": "已停止。"
+  },
+  "selectAll": {
+    "message": "全選"
+  },
+  "better": {
+    "message": "不限 10 頁 · 每行商品都帶訂單號 · 金額是數字可直接加總"
   }
 }

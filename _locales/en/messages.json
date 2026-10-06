@@ -152,5 +152,83 @@
   },
   "open": {
     "message": "Open"
+  },
+  "dialogTitle": {
+    "message": "Export orders"
+  },
+  "fieldsTitle": {
+    "message": "Fields to export"
+  },
+  "sku": {
+    "message": "Variant"
+  },
+  "postFee": {
+    "message": "Shipping (¥)"
+  },
+  "total": {
+    "message": "Total price (¥)"
+  },
+  "discount": {
+    "message": "Discount (¥)"
+  },
+  "rangeTitle": {
+    "message": "Which orders"
+  },
+  "rangeAll": {
+    "message": "All orders, back to the oldest"
+  },
+  "rangePages": {
+    "message": "The first"
+  },
+  "pagesUnit": {
+    "message": "pages (30 orders a page)"
+  },
+  "rangeDates": {
+    "message": "Ordered between"
+  },
+  "dateTo": {
+    "message": "and"
+  },
+  "skipClosed": {
+    "message": "Leave out closed and cancelled orders (交易关闭)"
+  },
+  "formatTitle": {
+    "message": "File format"
+  },
+  "formatXlsx": {
+    "message": "Excel (.xlsx)"
+  },
+  "formatJson": {
+    "message": "JSON"
+  },
+  "jsonNote": {
+    "message": "JSON always contains every field."
+  },
+  "start": {
+    "message": "Export"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "stop": {
+    "message": "Stop"
+  },
+  "pickField": {
+    "message": "Pick at least one field."
+  },
+  "noneMatch": {
+    "message": "No orders match these settings."
+  },
+  "badDates": {
+    "message": "Pick both dates."
+  },
+  "stopped": {
+    "message": "Stopped."
+  },
+  "selectAll": {
+    "message": "All"
+  },
+  "better": {
+    "message": "No 10-page limit · every item row keeps its order number · amounts as numbers"
   }
 }

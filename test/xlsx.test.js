@@ -75,15 +75,30 @@ test('workbook has an orders sheet and an items sheet', () => {
   assert.ok(orderSheet.includes('<c r="A2" t="inlineStr"><is><t xml:space="preserve">3123456789012345678</t>'));
   assert.ok(orderSheet.includes('Test &lt;Shop&gt; &amp; Co'));
   assert.ok(orderSheet.includes('手機殼 ×2；運費險'));
-  assert.ok(orderSheet.includes('<c r="F2"><v>3</v></c>'));
-  assert.ok(orderSheet.includes('<c r="G2" s="2"><v>58.9</v></c>'));
-  assert.ok(orderSheet.includes('<autoFilter ref="A1:G2"/>'));
+  // Default columns: order no., time, status, shop, paid, shipping, items, qty
+  assert.ok(orderSheet.includes('<c r="E2" s="2"><v>58.9</v></c>'));
+  assert.ok(orderSheet.includes('<c r="H2"><v>3</v></c>'));
+  assert.ok(orderSheet.includes('<autoFilter ref="A1:H2"/>'));
 
   const itemSheet = files['xl/worksheets/sheet2.xml'];
-  assert.ok(itemSheet.includes('<row r="3">'));
-  assert.ok(itemSheet.includes('<c r="F2" s="2"><v>29.45</v></c>'));
+  // Every item row repeats its order number (Taobao's own export leaves these blank)
+  assert.ok(itemSheet.includes('<row r="3"><c r="A3" t="inlineStr"><is><t xml:space="preserve">3123456789012345678</t>'));
+  // order no., time, status, shop, item, variant, qty, price, link, picture
+  assert.ok(itemSheet.includes('<c r="H2" s="2"><v>29.45</v></c>'));
   assert.ok(itemSheet.includes('HYPERLINK(&quot;https://img.alicdn.com/a.jpg&quot;,&quot;Open&quot;)'));
-  assert.ok(!itemSheet.includes('<c r="F3"'), 'blank price stays empty');
+  assert.ok(!itemSheet.includes('<c r="H3"'), 'blank price stays empty');
+});
+
+test('only the picked fields are exported', () => {
+  const files = unzip(ordersWorkbook(orders, labels, ['orderId', 'paid']));
+  assert.ok(!files['[Content_Types].xml'].includes('sheet2.xml'), 'no item fields, no items sheet');
+  const sheet = files['xl/worksheets/sheet1.xml'];
+  assert.ok(sheet.includes('<autoFilter ref="A1:B2"/>'));
+  assert.ok(sheet.includes('<c r="B2" s="2"><v>58.9</v></c>'));
+
+  const itemsOnly = unzip(ordersWorkbook(orders, labels, ['item', 'qty']));
+  assert.ok(!itemsOnly['xl/workbook.xml'].includes('<sheet name="Orders"'));
+  assert.ok(itemsOnly['xl/workbook.xml'].includes('<sheet name="Items"'));
 });
 
 test('links too long for a formula are written as text', () => {

@@ -81,13 +81,23 @@ function normalizeBoughtListV2(json) {
         qty: Number.parseInt(str(item.quantity), 10) || 1,
         price: yuan((item.priceInfo || {}).actualTotalFee),
       };
+      const sku = str(item.skuText);
+      if (sku) entry.sku = sku;
       const pic = httpsUrl(item.pic);
       const url = httpsUrl(item.itemUrl || item.outerUrl);
       if (pic) entry.pic = pic;
       if (url) entry.url = url;
       items.push(entry);
     }
-    orders.push({ id, time, shop: str(shop.shopName || shop.sellerName), items, paid, status: str(shop.tradeTitle) });
+    const order = { id, time, shop: str(shop.shopName || shop.sellerName), items, paid, status: str(shop.tradeTitle) };
+    // Shipping, total price and discount when Taobao gives them (older importers ignore extra fields)
+    const postFee = yuan((payment.pcPostFee || payment.postFee || {}).value);
+    const total = yuan((payment.totalFee || {}).value);
+    const discount = yuan((payment.discountFee || {}).value);
+    if (postFee) order.postFee = postFee;
+    if (total) order.total = total;
+    if (discount) order.discount = discount;
+    orders.push(order);
   }
   return {
     orders,
