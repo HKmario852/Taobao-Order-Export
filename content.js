@@ -1,8 +1,15 @@
-// 「已買到的寶貝」頁面右下角加一個掣：自動逐頁撳「下一頁」，抄低每頁訂單，然後下載一個 JSON 檔俾 Money Expense 匯入。
-// 全部喺你部電腦做，唔會將資料傳去任何地方。淘寶擋直接問資料，所以照住人咁轉頁。
+// Adds a small box to the bottom right of 已买到的宝贝: it clicks "next page" by itself, copies each page's
+// orders, then downloads them as Excel or JSON. Everything stays in your browser; nothing is sent anywhere.
+// Taobao blocks direct data requests, so the extension turns pages the way a person would.
 
 (() => {
-  const collected = new Map(); // 訂單號 → 訂單
+  const t = (key, ...subs) => chrome.i18n.getMessage(key, subs.map(String)) || key;
+  const collected = new Map(); // order number → order
+  // Column and sheet names for the Excel file, in the browser's language
+  const SHEET_LABELS = [
+    'ordersSheet', 'itemsSheet', 'orderId', 'time', 'shop', 'status', 'items',
+    'qty', 'paid', 'item', 'price', 'picture', 'link', 'open',
+  ];
   let lastPage = null; // { page, hasMore, totalNum, pageSize }
   let waiters = [];
 
@@ -11,7 +18,7 @@
     updateCount();
   };
 
-  // ---- 介面 ----
+  // ---- UI ----
   const box = document.createElement('div');
   box.style.cssText =
     'position:fixed;right:20px;bottom:20px;z-index:2147483647;background:#111;color:#fff;' +
@@ -19,16 +26,21 @@
   const status = document.createElement('div');
   status.style.marginBottom = '8px';
   const run = document.createElement('button');
-  run.textContent = '匯出全部訂單';
-  const save = document.createElement('button');
-  save.textContent = '下載';
-  for (const b of [run, save]) {
+  run.textContent = t('exportAll');
+  const saveXlsx = document.createElement('button');
+  saveXlsx.textContent = t('downloadExcel');
+  const saveJson = document.createElement('button');
+  saveJson.textContent = t('downloadJson');
+  const row = document.createElement('div');
+  row.style.marginTop = '6px';
+  for (const b of [run, saveXlsx, saveJson]) {
     b.style.cssText =
       'border:0;border-radius:999px;padding:6px 12px;margin-right:6px;cursor:pointer;font-weight:600;' +
-      'background:#C8F169;color:#111';
+      'background:#fff;color:#111';
   }
-  save.style.background = '#fff';
-  box.append(status, run, save);
+  run.style.background = '#C8F169';
+  row.append(saveXlsx, saveJson);
+  box.append(status, run, row);
   document.body.appendChild(box);
 
   function totalPages() {
@@ -37,14 +49,14 @@
   }
 
   function updateCount(note) {
-    const total = lastPage && lastPage.totalNum ? ` / 共 ${lastPage.totalNum}` : '';
-    status.textContent = note || `Money Expense：已收集 ${collected.size}${total} 張訂單`;
+    const total = lastPage && lastPage.totalNum;
+    status.textContent = note || (total ? t('collectedOf', collected.size, total) : t('collected', collected.size));
   }
   updateCount();
 
-  // 淘寶頁面自己載入嘅訂單（見 page_hook.js）
+  // Orders the page itself loaded (see page_hook.js)
   window.addEventListener('message', (e) => {
-    if (e.source !== window || !e.data || e.data.__moneyExpense !== 'orders') return;
+    if (e.source !== window || !e.data || e.data.__taobaoOrderExport !== 'orders') return;
     let json;
     try {
       json = JSON.parse(e.data.payload);
@@ -63,13 +75,13 @@
     addOrders(normalizeMainOrders(json && json.mainOrders));
   });
 
-  // 喺呢個 script 載入之前淘寶已經載入咗嘅，叫 page_hook.js 再送一次
-  window.postMessage({ __moneyExpense: 'replay' }, location.origin);
+  // Ask page_hook.js to resend whatever the page loaded before this script started
+  window.postMessage({ __taobaoOrderExport: 'replay' }, location.origin);
 
-  // ---- 轉頁 ----
+  // ---- Paging ----
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  /** 等淘寶載入第 [page] 頁；[timeoutMs] 內冇就返回 null（多數係要滑動驗證）。 */
+  /** Waits for Taobao to load page [page]; null after [timeoutMs] (usually a slide-to-verify check). */
   function waitForPage(page, timeoutMs) {
     if (lastPage && lastPage.page === page) return Promise.resolve(lastPage);
     return new Promise((resolve) => {
@@ -105,60 +117,80 @@
     busy = true;
     paused = false;
     run.disabled = true;
-    run.textContent = '讀緊…';
+    run.textContent = t('reading');
     try {
-      // 由第一頁開始（「繼續」就由而家嗰頁接住）
+      // Start from page 1 (Continue picks up from the current page)
       if (!resume && (!lastPage || lastPage.page !== 1)) {
-        if (!clickPager('.ant-pagination-item-1')) throw new Error('搵唔到第一頁嘅掣，請重新整理頁面');
+        if (!clickPager('.ant-pagination-item-1')) throw new Error(t('noFirstPage'));
         if (!(await waitForPage(1, 8000))) {
-          // 已經喺第一頁但未抄到：轉去第二頁再返嚟
-          if (!clickPager('.ant-pagination-item-2') || !(await waitForPage(2, 20000))) throw new Error('等唔到第一頁');
+          // Already on page 1 but nothing copied yet: go to page 2 and back
+          if (!clickPager('.ant-pagination-item-2') || !(await waitForPage(2, 20000))) throw new Error(t('noFirst'));
           await sleep(1500);
           clickPager('.ant-pagination-item-1');
-          if (!(await waitForPage(1, 20000))) throw new Error('等唔到第一頁');
+          if (!(await waitForPage(1, 20000))) throw new Error(t('noFirst'));
         }
       }
       let page = lastPage && lastPage.page ? lastPage.page : 1;
       while (lastPage && lastPage.hasMore) {
         const total = totalPages();
-        updateCount(`讀緊第 ${page + 1}${total ? ` / ${total}` : ''} 頁…（已收集 ${collected.size} 張）`);
-        // 好似人咁慢慢睇，唔好太密
+        updateCount(
+          total ? t('readingPageOf', page + 1, total, collected.size) : t('readingPage', page + 1, collected.size),
+        );
+        // Go at a person's pace, not too fast
         await sleep(2000 + Math.random() * 2000);
         if (!clickPager('.ant-pagination-next')) break;
         const next = await waitForPage(page + 1, 20000);
         if (!next) {
           paused = true;
-          throw new Error(`第 ${page + 1} 頁載入唔到：淘寶可能要你滑動驗證。完成後撳「繼續」`);
+          throw new Error(t('verify', page + 1));
         }
         page = next.page;
       }
-      updateCount(`讀完：${collected.size} 張訂單。撳「下載」`);
+      updateCount(t('done', collected.size));
     } catch (err) {
-      updateCount(`${err.message}（已收集 ${collected.size} 張）`);
+      updateCount(t('soFar', err.message, collected.size));
     } finally {
       busy = false;
       run.disabled = false;
-      run.textContent = paused ? '繼續' : '匯出全部訂單';
+      run.textContent = paused ? t('resume') : t('exportAll');
     }
   }
 
-  // 「繼續」：由而家嗰頁接住讀，唔使返去第一頁
+  // Continue: carry on from the current page instead of going back to page 1
   run.addEventListener('click', () => exportAll(paused && !!lastPage));
 
-  save.addEventListener('click', () => {
-    if (collected.size === 0) {
-      updateCount('未收集到訂單：先撳「匯出全部訂單」或者喺頁面轉一頁');
-      return;
-    }
-    const blob = new Blob([JSON.stringify(buildExport(collected), null, 1)], { type: 'application/json' });
+  function download(bytes, type, ext) {
+    const blob = new Blob([bytes], { type });
     const a = document.createElement('a');
     const day = new Date().toISOString().slice(0, 10);
     a.href = URL.createObjectURL(blob);
-    a.download = `taobao-orders-${day}.json`;
+    a.download = `taobao-orders-${day}.${ext}`;
     document.body.appendChild(a);
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 10000);
-    updateCount(`已下載 ${collected.size} 張訂單。擺上 Google Drive，再喺 App「匯入淘寶訂單」`);
+    updateCount(t('downloaded', collected.size));
+  }
+
+  function ready() {
+    if (collected.size > 0) return true;
+    updateCount(t('nothing'));
+    return false;
+  }
+
+  saveJson.addEventListener('click', () => {
+    if (!ready()) return;
+    download(JSON.stringify(buildExport(collected), null, 1), 'application/json', 'json');
+  });
+
+  saveXlsx.addEventListener('click', () => {
+    if (!ready()) return;
+    const labels = {};
+    for (const k of SHEET_LABELS) labels[k] = t(k);
+    download(
+      ordersWorkbook(buildExport(collected).orders, labels),
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'xlsx',
+    );
   });
 })();

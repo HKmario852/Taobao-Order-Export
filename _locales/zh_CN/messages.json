@@ -1,0 +1,156 @@
+{
+  "extName": {
+    "message": "淘宝订单导出"
+  },
+  "extDescription": {
+    "message": "把「已买到的宝贝」全部订单导出成 Excel 或 JSON。只在你的浏览器里运行，不会上传任何数据。"
+  },
+  "title": {
+    "message": "淘宝订单导出"
+  },
+  "exportAll": {
+    "message": "导出全部订单"
+  },
+  "resume": {
+    "message": "继续"
+  },
+  "reading": {
+    "message": "读取中…"
+  },
+  "downloadExcel": {
+    "message": "下载 Excel"
+  },
+  "downloadJson": {
+    "message": "下载 JSON"
+  },
+  "collected": {
+    "message": "已收集 $A$ 张订单",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      }
+    }
+  },
+  "collectedOf": {
+    "message": "已收集 $A$ / 共 $B$ 张订单",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      },
+      "B": {
+        "content": "$2"
+      }
+    }
+  },
+  "readingPage": {
+    "message": "正在读第 $A$ 页…（已收集 $B$ 张）",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      },
+      "B": {
+        "content": "$2"
+      }
+    }
+  },
+  "readingPageOf": {
+    "message": "正在读第 $A$ / $B$ 页…（已收集 $C$ 张）",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      },
+      "B": {
+        "content": "$2"
+      },
+      "C": {
+        "content": "$3"
+      }
+    }
+  },
+  "done": {
+    "message": "读完：$A$ 张订单。可以下载 Excel 或 JSON。",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      }
+    }
+  },
+  "soFar": {
+    "message": "$A$（已收集 $B$ 张）",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      },
+      "B": {
+        "content": "$2"
+      }
+    }
+  },
+  "noFirstPage": {
+    "message": "找不到第一页的按钮，请刷新页面"
+  },
+  "noFirst": {
+    "message": "第一页没有加载出来"
+  },
+  "verify": {
+    "message": "第 $A$ 页加载不出来：淘宝可能要你滑动验证。完成后点「继续」",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      }
+    }
+  },
+  "nothing": {
+    "message": "还没有收集到订单：先点「导出全部订单」，或者在页面翻一页"
+  },
+  "downloaded": {
+    "message": "已下载 $A$ 张订单",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      }
+    }
+  },
+  "ordersSheet": {
+    "message": "订单"
+  },
+  "itemsSheet": {
+    "message": "商品"
+  },
+  "orderId": {
+    "message": "订单号"
+  },
+  "time": {
+    "message": "下单时间"
+  },
+  "shop": {
+    "message": "店铺"
+  },
+  "status": {
+    "message": "状态"
+  },
+  "items": {
+    "message": "商品"
+  },
+  "qty": {
+    "message": "数量"
+  },
+  "paid": {
+    "message": "实付款 (¥)"
+  },
+  "item": {
+    "message": "商品"
+  },
+  "price": {
+    "message": "金额 (¥)"
+  },
+  "picture": {
+    "message": "图片"
+  },
+  "link": {
+    "message": "商品链接"
+  },
+  "open": {
+    "message": "打开"
+  }
+}

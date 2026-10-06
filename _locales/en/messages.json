@@ -1,0 +1,156 @@
+{
+  "extName": {
+    "message": "Order Exporter for Taobao"
+  },
+  "extDescription": {
+    "message": "Export all your Taobao orders (已买到的宝贝) to Excel or JSON. Runs only in your browser and sends nothing anywhere."
+  },
+  "title": {
+    "message": "Taobao order export"
+  },
+  "exportAll": {
+    "message": "Export all orders"
+  },
+  "resume": {
+    "message": "Continue"
+  },
+  "reading": {
+    "message": "Reading…"
+  },
+  "downloadExcel": {
+    "message": "Download Excel"
+  },
+  "downloadJson": {
+    "message": "Download JSON"
+  },
+  "collected": {
+    "message": "Collected $A$ orders",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      }
+    }
+  },
+  "collectedOf": {
+    "message": "Collected $A$ of $B$ orders",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      },
+      "B": {
+        "content": "$2"
+      }
+    }
+  },
+  "readingPage": {
+    "message": "Reading page $A$… ($B$ orders so far)",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      },
+      "B": {
+        "content": "$2"
+      }
+    }
+  },
+  "readingPageOf": {
+    "message": "Reading page $A$ of $B$… ($C$ orders so far)",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      },
+      "B": {
+        "content": "$2"
+      },
+      "C": {
+        "content": "$3"
+      }
+    }
+  },
+  "done": {
+    "message": "Done: $A$ orders. Download them as Excel or JSON.",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      }
+    }
+  },
+  "soFar": {
+    "message": "$A$ ($B$ orders so far)",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      },
+      "B": {
+        "content": "$2"
+      }
+    }
+  },
+  "noFirstPage": {
+    "message": "Can't find the page 1 button. Please reload the page."
+  },
+  "noFirst": {
+    "message": "Page 1 didn't load."
+  },
+  "verify": {
+    "message": "Page $A$ didn't load. Taobao may want you to slide to verify. Do that, then click Continue.",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      }
+    }
+  },
+  "nothing": {
+    "message": "No orders yet. Click \"Export all orders\" first, or turn a page."
+  },
+  "downloaded": {
+    "message": "Downloaded $A$ orders.",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      }
+    }
+  },
+  "ordersSheet": {
+    "message": "Orders"
+  },
+  "itemsSheet": {
+    "message": "Items"
+  },
+  "orderId": {
+    "message": "Order no."
+  },
+  "time": {
+    "message": "Order time"
+  },
+  "shop": {
+    "message": "Shop"
+  },
+  "status": {
+    "message": "Status"
+  },
+  "items": {
+    "message": "Items"
+  },
+  "qty": {
+    "message": "Qty"
+  },
+  "paid": {
+    "message": "Paid (¥)"
+  },
+  "item": {
+    "message": "Item"
+  },
+  "price": {
+    "message": "Amount (¥)"
+  },
+  "picture": {
+    "message": "Picture"
+  },
+  "link": {
+    "message": "Item page"
+  },
+  "open": {
+    "message": "Open"
+  }
+}

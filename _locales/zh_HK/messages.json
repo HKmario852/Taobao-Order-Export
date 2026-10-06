@@ -1,0 +1,156 @@
+{
+  "extName": {
+    "message": "淘寶訂單匯出"
+  },
+  "extDescription": {
+    "message": "將「已買到的寶貝」全部訂單匯出成 Excel 或 JSON。只在你的瀏覽器內執行，不會上傳任何資料。"
+  },
+  "title": {
+    "message": "淘寶訂單匯出"
+  },
+  "exportAll": {
+    "message": "匯出全部訂單"
+  },
+  "resume": {
+    "message": "繼續"
+  },
+  "reading": {
+    "message": "讀取中…"
+  },
+  "downloadExcel": {
+    "message": "下載 Excel"
+  },
+  "downloadJson": {
+    "message": "下載 JSON"
+  },
+  "collected": {
+    "message": "已收集 $A$ 張訂單",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      }
+    }
+  },
+  "collectedOf": {
+    "message": "已收集 $A$ / 共 $B$ 張訂單",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      },
+      "B": {
+        "content": "$2"
+      }
+    }
+  },
+  "readingPage": {
+    "message": "正在讀第 $A$ 頁…（已收集 $B$ 張）",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      },
+      "B": {
+        "content": "$2"
+      }
+    }
+  },
+  "readingPageOf": {
+    "message": "正在讀第 $A$ / $B$ 頁…（已收集 $C$ 張）",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      },
+      "B": {
+        "content": "$2"
+      },
+      "C": {
+        "content": "$3"
+      }
+    }
+  },
+  "done": {
+    "message": "讀完：$A$ 張訂單。可以下載 Excel 或 JSON。",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      }
+    }
+  },
+  "soFar": {
+    "message": "$A$（已收集 $B$ 張）",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      },
+      "B": {
+        "content": "$2"
+      }
+    }
+  },
+  "noFirstPage": {
+    "message": "找不到第一頁的按鈕，請重新整理頁面"
+  },
+  "noFirst": {
+    "message": "第一頁沒有載入"
+  },
+  "verify": {
+    "message": "第 $A$ 頁載入不了：淘寶可能要你滑動驗證。完成後按「繼續」",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      }
+    }
+  },
+  "nothing": {
+    "message": "還沒有收集到訂單：先按「匯出全部訂單」，或在頁面轉一頁"
+  },
+  "downloaded": {
+    "message": "已下載 $A$ 張訂單",
+    "placeholders": {
+      "A": {
+        "content": "$1"
+      }
+    }
+  },
+  "ordersSheet": {
+    "message": "訂單"
+  },
+  "itemsSheet": {
+    "message": "商品"
+  },
+  "orderId": {
+    "message": "訂單號"
+  },
+  "time": {
+    "message": "下單時間"
+  },
+  "shop": {
+    "message": "店鋪"
+  },
+  "status": {
+    "message": "狀態"
+  },
+  "items": {
+    "message": "商品"
+  },
+  "qty": {
+    "message": "數量"
+  },
+  "paid": {
+    "message": "實付款 (¥)"
+  },
+  "item": {
+    "message": "商品"
+  },
+  "price": {
+    "message": "金額 (¥)"
+  },
+  "picture": {
+    "message": "圖片"
+  },
+  "link": {
+    "message": "商品連結"
+  },
+  "open": {
+    "message": "開啟"
+  }
+}

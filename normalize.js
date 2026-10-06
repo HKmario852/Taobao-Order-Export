@@ -1,7 +1,7 @@
-// 將淘寶「已買到的寶貝」嘅訂單 JSON（mainOrders）轉做 Money Expense 讀得明嘅格式。
-// 只留記帳要用嘅欄位：訂單號、時間、店舖、商品名、數量、實付款、狀態。冇地址、電話、收件人。
+// Turns the order data that Taobao's 已买到的宝贝 page loads into a small, stable format.
+// Keeps only order number, time, shop, items, amount paid and status: no address, phone or recipient.
 
-const MONEY_EXPENSE_FORMAT = 'money-expense-taobao';
+const EXPORT_FORMAT = 'taobao-order-export';
 
 function str(v) {
   return v === undefined || v === null ? '' : String(v).trim();
@@ -17,7 +17,6 @@ function normalizeOrder(o) {
   const items = [];
   for (const s of Array.isArray(o.subOrders) ? o.subOrders : []) {
     const title = str((s.itemInfo || {}).title);
-    // 運費險、保險等附加項目冇商品頁，都照留，App 會合併做同一筆
     if (!title) continue;
     items.push({
       title,
@@ -44,7 +43,7 @@ function normalizeMainOrders(mainOrders) {
   return out;
 }
 
-// 淘寶嘅圖同連結有時係「//img.alicdn.com/…」，補返 https:
+// Taobao often gives pictures and links as "//img.alicdn.com/…"; add https:.
 function httpsUrl(v) {
   const u = str(v);
   if (u.startsWith('//')) return `https:${u}`;
@@ -55,9 +54,9 @@ function yuan(v) {
   return str(v).replace(/[^0-9.]/g, '');
 }
 
-// 新版「已買到的寶貝」（mtop.taobao.order.queryboughtlistV2）：每張訂單拆咗做幾個組件，
-// 用訂單號串返埋：shopInfo_<單號>（時間、店舖、狀態）、orderPayment_<單號>（實付款）、
-// orderItemInfo_<單號>_<子單號>（每件貨）。返回呢頁嘅訂單同分頁資料。
+// Current 已买到的宝贝 page (mtop.taobao.order.queryboughtlistV2): each order is split into
+// components keyed by order number: shopInfo_<id> (time, shop, status), orderPayment_<id> (paid)
+// and orderItemInfo_<id>_<sub id> (one per item). Returns this page's orders and paging.
 function normalizeBoughtListV2(json) {
   const comps = json && json.data && json.data.data;
   if (!comps || typeof comps !== 'object') return null;
@@ -101,7 +100,7 @@ function normalizeBoughtListV2(json) {
 
 function buildExport(ordersById) {
   const orders = [...ordersById.values()].sort((a, b) => (a.time < b.time ? 1 : -1));
-  return { format: MONEY_EXPENSE_FORMAT, version: 1, exportedAt: new Date().toISOString(), orders };
+  return { format: EXPORT_FORMAT, version: 1, exportedAt: new Date().toISOString(), orders };
 }
 
-if (typeof module !== 'undefined') module.exports = { normalizeOrder, normalizeMainOrders, normalizeBoughtListV2, buildExport };
+if (typeof module !== 'undefined') module.exports = { EXPORT_FORMAT, normalizeOrder, normalizeMainOrders, normalizeBoughtListV2, buildExport };

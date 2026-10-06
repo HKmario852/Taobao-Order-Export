@@ -3,7 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const { normalizeMainOrders, normalizeBoughtListV2, buildExport } = require('../normalize.js');
 
-// 假資料，唔係真訂單
+// Made-up data, not real orders
 const sample = [
   {
     id: '100001',
@@ -43,12 +43,12 @@ test('export is newest first with the format tag', () => {
   const a = { id: '1', time: '2026-01-01 10:00:00' };
   const b = { id: '2', time: '2026-02-01 10:00:00' };
   const out = buildExport(new Map([['1', a], ['2', b]]));
-  assert.strictEqual(out.format, 'money-expense-taobao');
+  assert.strictEqual(out.format, 'taobao-order-export');
   assert.strictEqual(out.version, 1);
   assert.deepStrictEqual(out.orders.map((o) => o.id), ['2', '1']);
 });
 
-// 新版「已買到的寶貝」回應（假資料）：每張訂單拆做幾個組件
+// Current bought-list response (made-up data): each order is split into components
 const v2 = {
   api: 'mtop.taobao.order.queryboughtlistV2',
   data: {

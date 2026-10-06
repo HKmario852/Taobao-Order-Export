@@ -1,9 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "淘寶訂單匯出（Money Expense）",
-  "version": "1.1.0",
-  "description": "將「已買到的寶貝」訂單匯出做檔案，再喺 Money Expense 匯入。唔會傳資料去任何地方。",
-  "host_permissions": ["https://buyertrade.taobao.com/*"],
+  "name": "__MSG_extName__",
+  "short_name": "Taobao Export",
+  "version": "2.0.0",
+  "description": "__MSG_extDescription__",
+  "default_locale": "en",
+  "icons": { "16": "icons/16.png", "32": "icons/32.png", "48": "icons/48.png", "128": "icons/128.png" },
   "content_scripts": [
     {
       "matches": ["https://buyertrade.taobao.com/trade/itemlist/*"],
@@ -13,7 +15,7 @@
     },
     {
       "matches": ["https://buyertrade.taobao.com/trade/itemlist/*"],
-      "js": ["normalize.js", "content.js"],
+      "js": ["normalize.js", "xlsx.js", "content.js"],
       "run_at": "document_idle"
     }
   ]
