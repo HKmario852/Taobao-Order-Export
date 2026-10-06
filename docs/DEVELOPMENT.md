@@ -29,6 +29,7 @@ Taobao page ──fetch/XHR──▶ page_hook.js (copies order responses)
 | [`_locales/`](../_locales) | Interface text: `en`, `zh_CN`, `zh_TW`, `zh_HK`. Chrome picks one from the browser language and falls back to English. |
 | [`test/`](../test) | `node:test` unit tests for the normaliser and the Excel writer. |
 | [`tools/screenshots/`](../tools/screenshots) | Demo page and script that regenerate the README screenshots. |
+| [`tools/icons/`](../tools/icons) | The icon artwork and `make_icons.py`, which cuts it into `icons/16–128.png` (`pip install pillow`, then `python tools/icons/make_icons.py`). |
 
 ## Output files
 
