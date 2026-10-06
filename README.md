@@ -1,42 +1,69 @@
-# 淘寶訂單匯出
+# Order Exporter for Taobao · 淘宝订单导出
 
-Chrome extension：將淘寶「已買到的寶貝」嘅訂單匯出做一個 JSON 檔，再喺 [Money Expense](https://github.com/HKmario852/money-manager) 嘅「設定 › 自動記錄 › 匯入淘寶訂單」匯入。
+A browser extension that exports **all** your Taobao orders from 已买到的宝贝 (My Taobao › Bought items) to
+**Excel (.xlsx)** or **JSON**, right back to your oldest order.
 
-- 全部喺你部電腦做：唔使淘寶密碼，唔會將資料傳去任何地方，冇追蹤。
-- 只會讀你登入咗嘅淘寶頁面，唔會落單、取消或者改任何嘢。
-- 只匯出記帳要用嘅欄位：訂單號、時間、店舖、商品名、商品圖連結、數量、實付款（人民幣）、狀態。冇地址、電話、收件人。
+- Runs only in your browser. No account, no password, no server: nothing is sent anywhere.
+- Only reads the Taobao page you are already signed in to. It never places, cancels or changes an order.
+- Exports only what you need to track spending: order number, time, shop, items (name, quantity, amount,
+  picture and item links), amount paid and status. No address, phone number or recipient.
+- Works in Chrome, Edge, Brave and other Chromium browsers. The interface is in English, 简体中文 or 繁體中文,
+  following your browser's language.
 
-## 安裝（一次）
+Not affiliated with Taobao or Alibaba.
 
-1. 喺 GitHub 撳 **Code › Download ZIP**，解壓。
-2. Chrome 打開 `chrome://extensions`，開右上角「開發人員模式」。
-3. 撳「載入未封裝項目」，揀解壓出嚟嘅資料夾（有 `manifest.json` 嗰個）。
+## Install
 
-## 每次匯出
+**From source (now):**
 
-1. 用 Chrome 登入淘寶，打開「我的淘寶 › 已買到的寶貝」。
-2. 右下角撳「匯出全部訂單」。extension 會由第一頁開始，自己逐頁撳「下一頁」（每頁之間停 2–4 秒，好似人咁睇），抄低每頁嘅訂單，一直讀到最舊嗰張。大約每 30 張一頁，500 幾張訂單約一分鐘。
-3. 讀完撳「下載」，得到 `taobao-orders-日期.json`。
-4. 將個檔擺上 Google Drive（或者傳去電話），喺 Money Expense 匯入。同一張訂單匯入幾多次都只會記一次。
+1. Download this repository (**Code › Download ZIP**) and unzip it.
+2. Open `chrome://extensions` (Brave: `brave://extensions`, Edge: `edge://extensions`).
+3. Turn on **Developer mode** (top right).
+4. Click **Load unpacked** and pick the unzipped folder (the one with `manifest.json`).
 
-淘寶會擋 extension 自己直接問訂單資料，所以 extension 唔會咁做，只係抄低淘寶頁面本身載入嘅資料。
-如果中途淘寶要你滑動驗證，extension 會停低；完成驗證之後撳「繼續」，會由停低嗰頁接住讀。
+Keep the folder where it is: the browser loads the extension from it.
 
-## 匯出格式
+## Export your orders
+
+1. Sign in to Taobao and open **我的淘宝 › 已买到的宝贝**.
+2. A black box appears at the bottom right. Click **Export all orders**.
+   The extension goes back to page 1 and clicks "next page" by itself, pausing 2–4 seconds per page like a
+   person reading. About 30 orders per page, so 500 orders take about a minute.
+3. When it says it's done, click **Download Excel** or **Download JSON**.
+
+If Taobao asks you to slide to verify partway through, the extension stops. Finish the check, then click
+**Continue** to carry on from that page.
+
+Taobao blocks extensions that request order data directly, so this one doesn't: it only copies the data the
+page itself loads as it turns the pages.
+
+## Excel file
+
+`taobao-orders-<date>.xlsx` has two sheets:
+
+| Sheet | One row per | Columns |
+| --- | --- | --- |
+| Orders | order | order no., order time, shop, status, items, qty, paid (¥) |
+| Items | item | order no., order time, shop, item, qty, amount (¥), picture link, item page link |
+
+"Paid" appears once per order, so you can sum the Orders sheet safely. Order numbers are kept as text so Excel
+doesn't round them. The header row is frozen and has filters.
+
+## JSON file
 
 ```json
 {
-  "format": "money-expense-taobao",
+  "format": "taobao-order-export",
   "version": 1,
   "exportedAt": "2026-10-05T16:00:00.000Z",
   "orders": [
     {
-      "id": "訂單號",
+      "id": "order number",
       "time": "2026-09-30 21:05:11",
-      "shop": "店舖名",
+      "shop": "shop name",
       "items": [
         {
-          "title": "商品名",
+          "title": "item name",
           "qty": 1,
           "price": "29.45",
           "pic": "https://img.alicdn.com/…jpg",
@@ -50,17 +77,45 @@ Chrome extension：將淘寶「已買到的寶貝」嘅訂單匯出做一個 JSO
 }
 ```
 
-`time` 係中國時間；`paid` 同 `price` 係人民幣。`pic`（商品圖）同 `url`（商品頁）可能冇。
+`time` is China time. `paid` and `price` are in RMB. `pic` and `url` may be missing. Orders are newest first.
 
-## 檔案
+## 中文说明
 
-- `manifest.json`：Chrome extension 設定（Manifest V3），只喺 `buyertrade.taobao.com/trade/itemlist/*` 行。
-- `content.js`：右下角嘅掣，自動逐頁撳「下一頁」同下載。
-- `page_hook.js`：喺淘寶頁面抄低淘寶自己載入嘅訂單（`mtop.taobao.order.queryboughtlistV2`）。
-- `normalize.js`：將淘寶嘅訂單資料（新版同舊版）轉做上面嘅格式。
+把淘宝「已买到的宝贝」里的全部订单（一直到最旧的一张）导出成 Excel 或 JSON。
 
-## 測試
+- 只在你的浏览器里运行，不用登录、不用密码、没有服务器，不会上传任何数据。
+- 只读取你已经登录的淘宝页面，不会下单、取消或修改订单。
+- 只导出记账需要的字段：订单号、时间、店铺、商品（名称、数量、金额、图片和商品链接）、实付款、状态。没有地址、电话或收件人。
 
-```sh
-node --test
+**安装：** 下载本仓库（Code › Download ZIP）并解压，打开 `chrome://extensions`（Brave 用 `brave://extensions`），
+开启右上角「开发者模式」，点「加载已解压的扩展程序」，选有 `manifest.json` 的文件夹。
+
+**导出：** 登录淘宝，打开「我的淘宝 › 已买到的宝贝」，点右下角「导出全部订单」，读完后点「下载 Excel」或「下载 JSON」。
+如果中途要滑动验证，完成后点「继续」。
+
+本扩展与淘宝、阿里巴巴无关。
+
+## Privacy
+
+See [PRIVACY.md](PRIVACY.md). In short: the extension collects nothing and sends nothing.
+
+## Development
+
 ```
+node --test test/*.test.js
+```
+
+- `manifest.json`: Manifest V3. Runs only on `buyertrade.taobao.com/trade/itemlist/*`.
+- `page_hook.js`: runs in the page and copies the order responses Taobao itself loads
+  (`mtop.taobao.order.queryboughtlistV2`, or `mainOrders` on the older page).
+- `normalize.js`: turns those responses into the JSON format above.
+- `xlsx.js`: a small dependency-free Excel writer.
+- `content.js`: the box at the bottom right; turns pages and downloads the files.
+- `_locales/`: English, 简体中文 and 繁體中文 (zh_TW and zh_HK) text.
+
+Every push builds `taobao-order-export-<version>.zip`, ready to upload to the Chrome Web Store, under the
+**Actions** tab.
+
+## License
+
+[MIT](LICENSE)

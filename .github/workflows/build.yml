@@ -1,0 +1,27 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --test test/*.test.js
+      - name: Read version
+        run: echo "VERSION=$(node -p "require('./manifest.json').version")" >> "$GITHUB_ENV"
+      # The artifact downloads as a zip with these files at its root, ready for the Chrome Web Store
+      - uses: actions/upload-artifact@v4
+        with:
+          name: taobao-order-export-${{ env.VERSION }}
+          path: |
+            manifest.json
+            *.js
+            _locales
+            icons
