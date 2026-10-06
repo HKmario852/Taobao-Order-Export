@@ -152,5 +152,83 @@
   },
   "open": {
     "message": "打开"
+  },
+  "dialogTitle": {
+    "message": "导出订单"
+  },
+  "fieldsTitle": {
+    "message": "导出订单字段"
+  },
+  "sku": {
+    "message": "型号款式"
+  },
+  "postFee": {
+    "message": "运费"
+  },
+  "total": {
+    "message": "总价"
+  },
+  "discount": {
+    "message": "优惠"
+  },
+  "rangeTitle": {
+    "message": "订单范围"
+  },
+  "rangeAll": {
+    "message": "全部订单（一直到最早一张）"
+  },
+  "rangePages": {
+    "message": "前"
+  },
+  "pagesUnit": {
+    "message": "页（每页 30 张订单）"
+  },
+  "rangeDates": {
+    "message": "下单日期"
+  },
+  "dateTo": {
+    "message": "至"
+  },
+  "skipClosed": {
+    "message": "不导出交易关闭的订单"
+  },
+  "formatTitle": {
+    "message": "文件格式"
+  },
+  "formatXlsx": {
+    "message": "Excel（.xlsx）"
+  },
+  "formatJson": {
+    "message": "JSON"
+  },
+  "jsonNote": {
+    "message": "JSON 会包含全部字段。"
+  },
+  "start": {
+    "message": "导出"
+  },
+  "cancel": {
+    "message": "取消"
+  },
+  "stop": {
+    "message": "停止"
+  },
+  "pickField": {
+    "message": "请至少选择一个字段。"
+  },
+  "noneMatch": {
+    "message": "没有符合条件的订单。"
+  },
+  "badDates": {
+    "message": "请选择开始和结束日期。"
+  },
+  "stopped": {
+    "message": "已停止。"
+  },
+  "selectAll": {
+    "message": "全选"
+  },
+  "better": {
+    "message": "不限 10 页 · 每行商品都带订单号 · 金额是数字可直接加总"
   }
 }

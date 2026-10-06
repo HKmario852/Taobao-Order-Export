@@ -233,49 +233,90 @@ function yuanNumber(v) {
   return Number.isFinite(n) ? n : null;
 }
 
-/**
- * Two sheets: one row per order (amount paid once per order, safe to sum) and
- * one row per item (with picture and item links). [t] gives the localised labels.
- */
-function ordersWorkbook(orders, t) {
-  const orderRows = orders.map((o) => [
-    o.id,
-    o.time,
-    o.shop,
-    o.status,
-    (o.items || []).map((i) => (i.qty > 1 ? `${i.title} ×${i.qty}` : i.title)).join('；'),
-    (o.items || []).reduce((n, i) => n + (i.qty || 0), 0),
-    { money: yuanNumber(o.paid) },
-  ]);
-  const itemRows = [];
-  for (const o of orders) {
-    for (const i of o.items || []) {
-      itemRows.push([
-        o.id,
-        o.time,
-        o.shop,
-        i.title,
-        i.qty,
-        { money: yuanNumber(i.price) },
-        i.pic ? { link: i.pic, text: t.open } : null,
-        i.url ? { link: i.url, text: t.open } : null,
-      ]);
-    }
+// Fields the user can pick, like Taobao's own 导出订单 dialog. Order fields describe the whole order;
+// item fields describe one item. Money is written as numbers so the columns can be summed.
+const ORDER_FIELDS = ['orderId', 'time', 'status', 'shop', 'paid', 'postFee', 'total', 'discount'];
+const ITEM_FIELDS = ['item', 'sku', 'qty', 'price', 'link', 'picture'];
+const ALL_FIELDS = [...ORDER_FIELDS, ...ITEM_FIELDS];
+const DEFAULT_FIELDS = ['orderId', 'time', 'status', 'shop', 'paid', 'postFee', 'item', 'sku', 'qty', 'price', 'link', 'picture'];
+
+const WIDTHS = {
+  orderId: 22, time: 20, status: 14, shop: 24, paid: 12, postFee: 10, total: 12, discount: 10,
+  items: 60, qty: 8, item: 60, sku: 30, price: 12, link: 10, picture: 10,
+};
+
+function orderCell(o, f) {
+  switch (f) {
+    case 'orderId': return o.id;
+    case 'time': return o.time;
+    case 'status': return o.status;
+    case 'shop': return o.shop;
+    case 'paid': return { money: yuanNumber(o.paid) };
+    case 'postFee': return { money: yuanNumber(o.postFee) };
+    case 'total': return { money: yuanNumber(o.total) };
+    case 'discount': return { money: yuanNumber(o.discount) };
+    default: return null;
   }
-  return writeXlsx([
-    {
-      name: t.ordersSheet,
-      header: [t.orderId, t.time, t.shop, t.status, t.items, t.qty, t.paid],
-      widths: [22, 20, 24, 14, 60, 8, 12],
-      rows: orderRows,
-    },
-    {
-      name: t.itemsSheet,
-      header: [t.orderId, t.time, t.shop, t.item, t.qty, t.price, t.picture, t.link],
-      widths: [22, 20, 24, 60, 8, 12, 10, 10],
-      rows: itemRows,
-    },
-  ]);
 }
 
-if (typeof module !== 'undefined') module.exports = { crc32, zipStore, writeXlsx, ordersWorkbook, colName };
+function itemCell(i, f, t) {
+  switch (f) {
+    case 'item': return i.title;
+    case 'sku': return i.sku;
+    case 'qty': return i.qty;
+    case 'price': return { money: yuanNumber(i.price) };
+    case 'link': return i.url ? { link: i.url, text: t.open } : null;
+    case 'picture': return i.pic ? { link: i.pic, text: t.open } : null;
+    default: return null;
+  }
+}
+
+/**
+ * Two sheets, using only the picked [fields] (default: like Taobao's own export):
+ * - Orders: one row per order, so the money columns add up correctly.
+ * - Items: one row per item. Unlike Taobao's file, every row repeats its order number, time, shop and
+ *   status, so each row stands on its own when sorted or filtered.
+ * [t] gives the localised labels.
+ */
+function ordersWorkbook(orders, t, fields = DEFAULT_FIELDS) {
+  const picked = new Set(fields);
+  const orderCols = ORDER_FIELDS.filter((f) => picked.has(f));
+  const itemCols = ITEM_FIELDS.filter((f) => picked.has(f));
+  const sheets = [];
+  if (orderCols.length) {
+    const summary = itemCols.length ? ['items', 'qty'] : [];
+    sheets.push({
+      name: t.ordersSheet,
+      header: [...orderCols.map((f) => t[f]), ...summary.map((f) => t[f])],
+      widths: [...orderCols, ...summary].map((f) => WIDTHS[f]),
+      rows: orders.map((o) => [
+        ...orderCols.map((f) => orderCell(o, f)),
+        ...(itemCols.length
+          ? [
+              (o.items || []).map((i) => (i.qty > 1 ? `${i.title} ×${i.qty}` : i.title)).join('；'),
+              (o.items || []).reduce((n, i) => n + (i.qty || 0), 0),
+            ]
+          : []),
+      ]),
+    });
+  }
+  if (itemCols.length) {
+    // Order context repeated on every item row (money stays on the Orders sheet so totals aren't doubled)
+    const context = ['orderId', 'time', 'status', 'shop'].filter((f) => picked.has(f));
+    const rows = [];
+    for (const o of orders) {
+      for (const i of o.items || []) {
+        rows.push([...context.map((f) => orderCell(o, f)), ...itemCols.map((f) => itemCell(i, f, t))]);
+      }
+    }
+    sheets.push({
+      name: t.itemsSheet,
+      header: [...context, ...itemCols].map((f) => t[f]),
+      widths: [...context, ...itemCols].map((f) => WIDTHS[f]),
+      rows,
+    });
+  }
+  return writeXlsx(sheets);
+}
+
+if (typeof module !== 'undefined') module.exports = { crc32, zipStore, writeXlsx, ordersWorkbook, colName, ORDER_FIELDS, ITEM_FIELDS, ALL_FIELDS, DEFAULT_FIELDS };
