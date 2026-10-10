@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "__MSG_extName__",
   "short_name": "Taobao Export",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "__MSG_extDescription__",
   "default_locale": "en",
   "icons": { "16": "icons/16.png", "32": "icons/32.png", "48": "icons/48.png", "128": "icons/128.png" },
@@ -15,7 +15,7 @@
     },
     {
       "matches": ["https://buyertrade.taobao.com/trade/itemlist/*"],
-      "js": ["normalize.js", "xlsx.js", "content.js"],
+      "js": ["normalize.js", "xlsx.js", "csv.js", "content.js"],
       "run_at": "document_idle"
     }
   ]

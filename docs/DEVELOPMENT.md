@@ -14,7 +14,7 @@ Taobao page ──fetch/XHR──▶ page_hook.js (copies order responses)
                            content.js ──▶ normalize.js ──▶ orders in memory
                                │ clicks "next page", waits 2–4 s, repeats
                                ▼
-                           xlsx.js / JSON ──▶ download
+                           xlsx.js / csv.js / JSON ──▶ download
 ```
 
 ## Files
@@ -25,9 +25,10 @@ Taobao page ──fetch/XHR──▶ page_hook.js (copies order responses)
 | [`page_hook.js`](../page_hook.js) | Runs in the page (`world: MAIN`) at `document_start`. Wraps `fetch` and `XMLHttpRequest` and copies responses that contain orders (`mtop.taobao.order.queryboughtlistV2`, or `mainOrders` on the older page). |
 | [`normalize.js`](../normalize.js) | Turns those responses into the JSON format below and reads the paging info. |
 | [`xlsx.js`](../xlsx.js) | A dependency-free `.xlsx` writer (stored zip, inline strings, numbers, `HYPERLINK` formulas) and the workbook layout. |
+| [`csv.js`](../csv.js) | The CSV writer: one row per item, reusing the field list and cells from `xlsx.js`. |
 | [`content.js`](../content.js) | The **Export all orders** buttons, the dialog, paging, filtering by range and the download. Dialog choices are saved in `localStorage` under `taobaoOrderExport.prefs`. |
 | [`_locales/`](../_locales) | Interface text: `en`, `zh_CN`, `zh_TW`, `zh_HK`. Chrome picks one from the browser language and falls back to English. |
-| [`test/`](../test) | `node:test` unit tests for the normaliser and the Excel writer. |
+| [`test/`](../test) | `node:test` unit tests for the normaliser and the Excel and CSV writers. |
 | [`tools/screenshots/`](../tools/screenshots) | Demo page and script that regenerate the README screenshots. |
 | [`tools/icons/`](../tools/icons) | The icon artwork and `make_icons.py`, which cuts it into `icons/16–128.png` (`pip install pillow`, then `python tools/icons/make_icons.py`). |
 
@@ -45,6 +46,14 @@ Up to two sheets, with only the fields picked in the dialog:
 Money is written once per order on the Orders sheet, so it can be summed. Order numbers are text so Excel
 doesn't round them. Header rows are frozen and filtered. Links longer than Excel's 255-character formula
 limit are written as plain text.
+
+### CSV (`taobao-orders-<date>.csv`)
+
+One row per item (or per order when no item fields are picked), with the picked order fields first. An
+order's money columns are filled on its first row only, so a column sum doesn't count an order twice. UTF-8
+with a BOM and CRLF line endings; links are plain URLs. Text starting with `=`, `+`, `-` or `@` gets a leading
+`'` so spreadsheet apps don't run it as a formula. Excel shows long order numbers in scientific notation, so the
+dialog recommends `.xlsx` for Excel.
 
 ### JSON (`taobao-orders-<date>.json`)
 

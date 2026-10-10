@@ -3,6 +3,8 @@ name: Build
 on:
   push:
     branches: [main]
+    # Pushing a tag like v2.2.0 (matching manifest.json) publishes a GitHub Release with the extension zip
+    tags: ['v*']
   pull_request:
 
 jobs:
@@ -25,3 +27,27 @@ jobs:
             *.js
             _locales
             icons
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the tag matches manifest.json
+        run: |
+          version=$(node -p "require('./manifest.json').version")
+          if [ "${GITHUB_REF_NAME}" != "v${version}" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match manifest.json version ${version}"
+            exit 1
+          fi
+          echo "VERSION=${version}" >> "$GITHUB_ENV"
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          zip="taobao-order-export-${VERSION}.zip"
+          zip -r "$zip" manifest.json *.js _locales icons
+          gh release create "$GITHUB_REF_NAME" "$zip" --title "Taobao Order Export ${VERSION}" --generate-notes
