@@ -48,9 +48,9 @@ Todas las capturas usan pedidos de demostración inventados.
 ## 📥 Instalación
 
 > [!NOTE]
-> La extensión aún no está en la Chrome Web Store. Por ahora, instálala desde el código fuente.
+> La extensión aún no está en la Chrome Web Store. Por ahora, instálala desde el zip de la release.
 
-1. Descarga este repositorio (**Code › Download ZIP**) y descomprímelo.
+1. Descarga `taobao-order-export-<versión>.zip` de la [última release](https://github.com/HKmario852/Taobao-Order-Export/releases/latest) y descomprímelo.
 2. Abre `chrome://extensions` (Edge: `edge://extensions`, Brave: `brave://extensions`).
 3. Activa el **modo de desarrollador**, pulsa **Cargar descomprimida** y elige la carpeta que contiene `manifest.json`.
 
@@ -68,7 +68,7 @@ Si Taobao muestra una verificación deslizante, complétala y pulsa **Continue**
 | | 导出订单 de Taobao | Esta extensión |
 | --- | --- | --- |
 | Pedidos por exportación | hasta 10 páginas | todos, primeras *N* páginas o rango de fechas |
-| Formatos | Excel | Excel o JSON |
+| Formatos | Excel | Excel, CSV o JSON |
 | 2.º artículo y siguientes de un pedido | n.º de pedido, fecha y tienda en blanco | siempre rellenos |
 | Importes | texto como `￥26.80` | números |
 | Enlaces de imagen | no | sí |

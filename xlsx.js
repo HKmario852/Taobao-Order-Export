@@ -319,4 +319,4 @@ function ordersWorkbook(orders, t, fields = DEFAULT_FIELDS) {
   return writeXlsx(sheets);
 }
 
-if (typeof module !== 'undefined') module.exports = { crc32, zipStore, writeXlsx, ordersWorkbook, colName, ORDER_FIELDS, ITEM_FIELDS, ALL_FIELDS, DEFAULT_FIELDS };
+if (typeof module !== 'undefined') module.exports = { crc32, zipStore, writeXlsx, ordersWorkbook, colName, orderCell, itemCell, ORDER_FIELDS, ITEM_FIELDS, ALL_FIELDS, DEFAULT_FIELDS };

@@ -4,7 +4,7 @@
 
 # 淘寶訂單匯出（Order Exporter for Taobao）
 
-**在瀏覽器內，把淘寶「已買到的寶貝」的全部訂單匯出成 Excel 或 JSON。**
+**在瀏覽器內，把淘寶「已買到的寶貝」的全部訂單匯出成 Excel、CSV 或 JSON。**
 
 ![Manifest V3](https://img.shields.io/badge/Manifest-V3-ff5000)
 ![Chrome | Edge | Brave](https://img.shields.io/badge/Chrome%20%7C%20Edge%20%7C%20Brave-supported-4285F4?logo=googlechrome&logoColor=white)
@@ -38,16 +38,16 @@
 - 📦 **全部訂單**，一直到最早那一張。淘寶自帶的「导出订单」每次最多 10 頁。
 - 📅 **選擇範圍**：全部訂單、前 *N* 頁，或某段日期內下的單；也可以不匯出交易關閉的訂單。
 - ☑️ **像淘寶的視窗一樣勾選欄位**：訂單號、時間、狀態、店鋪、實付款、運費、總價、優惠、商品、型號款式、數量、金額、商品連結、圖片。
-- 📊 **Excel（.xlsx）或 JSON。** Excel 裡每行商品都帶訂單號，金額是數字，另有一張「訂單」表，加總不會重複計算。
+- 📊 **Excel（.xlsx）、CSV 或 JSON。** Excel 裡每行商品都帶訂單號，金額是數字，另有一張「訂單」表，加總不會重複計算。
 - 🔒 **只在本機執行。** 不用帳號、沒有伺服器、沒有追蹤，只讀取淘寶頁面本身已載入的資料。
 - 🌐 **介面有英文、简体中文、繁體中文**，跟隨瀏覽器語言。
 
 ## 📥 安裝
 
 > [!NOTE]
-> 擴充功能尚未上架 Chrome 線上應用程式商店，暫時請從原始碼安裝。
+> 擴充功能尚未上架 Chrome 線上應用程式商店，暫時請用 Release 內的 zip 安裝。
 
-1. 下載本 repo（**Code › Download ZIP**）並解壓縮。
+1. 從[最新 Release](https://github.com/HKmario852/Taobao-Order-Export/releases/latest) 下載 `taobao-order-export-<版本>.zip` 並解壓縮。
 2. 開啟 `chrome://extensions`（Edge：`edge://extensions`，Brave：`brave://extensions`）。
 3. 開啟「開發人員模式」，按「載入未封裝項目」，選擇含有 `manifest.json` 的資料夾。
 
@@ -65,7 +65,7 @@
 | | 淘寶「导出订单」 | 本擴充功能 |
 | --- | --- | --- |
 | 每次匯出多少 | 最多 10 頁 | 全部、前 *N* 頁或日期範圍 |
-| 格式 | Excel | Excel 或 JSON |
+| 格式 | Excel | Excel、CSV 或 JSON |
 | 同一張單的第 2 件以後 | 訂單號、時間、店鋪留空 | 每行都有 |
 | 金額 | 像 `￥26.80` 的文字 | 數字 |
 | 圖片連結 | 沒有 | 有 |

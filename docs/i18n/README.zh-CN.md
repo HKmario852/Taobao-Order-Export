@@ -4,7 +4,7 @@
 
 # 淘宝订单导出（Order Exporter for Taobao）
 
-**在浏览器里，把淘宝「已买到的宝贝」的全部订单导出成 Excel 或 JSON。**
+**在浏览器里，把淘宝「已买到的宝贝」的全部订单导出成 Excel、CSV 或 JSON。**
 
 ![Manifest V3](https://img.shields.io/badge/Manifest-V3-ff5000)
 ![Chrome | Edge | Brave](https://img.shields.io/badge/Chrome%20%7C%20Edge%20%7C%20Brave-supported-4285F4?logo=googlechrome&logoColor=white)
@@ -38,16 +38,16 @@
 - 📦 **全部订单**，一直到最早的那一张。淘宝自带的「导出订单」每次最多 10 页。
 - 📅 **选择范围**：全部订单、前 *N* 页，或某段日期内下的单；也可以不导出交易关闭的订单。
 - ☑️ **像淘宝的窗口一样勾选字段**：订单号、时间、状态、店铺、实付款、运费、总价、优惠、商品、型号款式、数量、金额、商品链接、图片。
-- 📊 **Excel（.xlsx）或 JSON。** Excel 里每行商品都带订单号，金额是数字，另有一张「订单」表，加总不会重复计算。
+- 📊 **Excel（.xlsx）、CSV 或 JSON。** Excel 里每行商品都带订单号，金额是数字，另有一张「订单」表，加总不会重复计算。
 - 🔒 **只在本地运行。** 不用账号、没有服务器、没有追踪，只读取淘宝页面本身已加载的数据。
 - 🌐 **界面支持英文、简体中文、繁體中文**，跟随浏览器语言。
 
 ## 📥 安装
 
 > [!NOTE]
-> 扩展还没有上架 Chrome 应用商店，暂时请从源码安装。
+> 扩展还没有上架 Chrome 应用商店，暂时请用 Release 里的 zip 安装。
 
-1. 下载本仓库（**Code › Download ZIP**）并解压。
+1. 从[最新 Release](https://github.com/HKmario852/Taobao-Order-Export/releases/latest) 下载 `taobao-order-export-<版本>.zip` 并解压。
 2. 打开 `chrome://extensions`（Edge：`edge://extensions`，Brave：`brave://extensions`）。
 3. 开启「开发者模式」，点「加载已解压的扩展程序」，选择包含 `manifest.json` 的文件夹。
 
@@ -65,7 +65,7 @@
 | | 淘宝「导出订单」 | 本扩展 |
 | --- | --- | --- |
 | 每次导出多少 | 最多 10 页 | 全部、前 *N* 页或日期范围 |
-| 格式 | Excel | Excel 或 JSON |
+| 格式 | Excel | Excel、CSV 或 JSON |
 | 同一订单的第 2 件以后 | 订单号、时间、店铺留空 | 每行都有 |
 | 金额 | 像 `￥26.80` 这样的文字 | 数字 |
 | 图片链接 | 没有 | 有 |

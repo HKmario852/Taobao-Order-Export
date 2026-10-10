@@ -163,16 +163,20 @@
   section(t('formatTitle'));
   const formatBox = el('div', 'display:flex;gap:24px;align-items:center;flex-wrap:wrap');
   const jsonNote = el('span', 'color:#888;font-size:12px', t('jsonNote'));
+  const csvNote = el('span', 'color:#888;font-size:12px', t('csvNote'));
   const setFormat = (v) => {
     prefs.format = v;
     savePrefs();
     grid.style.opacity = v === 'json' ? '.45' : '1';
     jsonNote.style.display = v === 'json' ? 'inline' : 'none';
+    csvNote.style.display = v === 'csv' ? 'inline' : 'none';
   };
   formatBox.append(
     radio('teFormat', 'xlsx', t('formatXlsx'), prefs.format === 'xlsx', setFormat).label,
+    radio('teFormat', 'csv', t('formatCsv'), prefs.format === 'csv', setFormat).label,
     radio('teFormat', 'json', t('formatJson'), prefs.format === 'json', setFormat).label,
     jsonNote,
+    csvNote,
   );
   dialog.append(formatBox);
   setFormat(prefs.format);
@@ -327,7 +331,7 @@
 
   async function exportOrders() {
     if (busy) return;
-    if (prefs.format === 'xlsx' && prefs.fields.length === 0) return updateCount(t('pickField'));
+    if (prefs.format !== 'json' && prefs.fields.length === 0) return updateCount(t('pickField'));
     if (prefs.range === 'dates' && (!prefs.from || !prefs.to)) return updateCount(t('badDates'));
     const resume = paused && !!lastPage;
     busy = true;
@@ -358,7 +362,11 @@
         );
         // Go at a person's pace, not too fast
         await sleep(2000 + Math.random() * 2000);
-        if (!clickPager('.ant-pagination-next')) break;
+        if (!clickPager('.ant-pagination-next')) {
+          // A disabled button means the last page; no button at all means Taobao's page has changed
+          if (!document.querySelector('.ant-pagination-next')) throw new Error(t('pageChanged'));
+          break;
+        }
         const next = await waitForPage(page + 1, 20000);
         if (!next) {
           paused = true;
@@ -390,6 +398,11 @@
       out.orders = orders;
       bytes = JSON.stringify(out, null, 1);
       type = 'application/json';
+    } else if (prefs.format === 'csv') {
+      const labels = {};
+      for (const k of ALL_FIELDS) labels[k] = t(k);
+      bytes = ordersCsv(orders, labels, prefs.fields);
+      type = 'text/csv;charset=utf-8';
     } else {
       const labels = {};
       for (const k of SHEET_LABELS) labels[k] = t(k);
@@ -404,5 +417,7 @@
     a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 10000);
     updateCount(t('downloaded', orders.length));
+    // The page hook no longer needs the responses it kept for replay
+    window.postMessage({ __taobaoOrderExport: 'clear' }, location.origin);
   }
 })();

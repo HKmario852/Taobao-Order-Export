@@ -4,7 +4,7 @@
 
 # Order Exporter for Taobao
 
-**Export every order from Taobao's 已买到的宝贝 page to Excel or JSON, right in your browser.**
+**Export every order from Taobao's 已买到的宝贝 page to Excel, CSV or JSON, right in your browser.**
 
 ![Manifest V3](https://img.shields.io/badge/Manifest-V3-ff5000)
 ![Chrome | Edge | Brave](https://img.shields.io/badge/Chrome%20%7C%20Edge%20%7C%20Brave-supported-4285F4?logo=googlechrome&logoColor=white)
@@ -38,16 +38,16 @@ All screenshots use made-up demo orders.
 - 📦 **All your orders**, back to the oldest one. Taobao's own 导出订单 stops at 10 pages per export.
 - 📅 **Pick a range**: all orders, the first *N* pages, or orders placed between two dates. Optionally leave out closed orders.
 - ☑️ **Pick the fields** like Taobao's dialog: order no., time, status, shop, paid, shipping, total, discount, item, variant, qty, amount, item link, picture.
-- 📊 **Excel (.xlsx) or JSON.** In Excel, every item row keeps its order number, amounts are real numbers, and an Orders sheet keeps totals from being counted twice.
+- 📊 **Excel (.xlsx), CSV or JSON.** In Excel, every item row keeps its order number, amounts are real numbers, and an Orders sheet keeps totals from being counted twice. CSV is one row per item for other apps and scripts.
 - 🔒 **Local only.** No account, no server, no tracking. It reads only what the Taobao page has already loaded.
 - 🌐 **Interface in English, 简体中文 and 繁體中文**, following your browser's language.
 
 ## 📥 Install
 
 > [!NOTE]
-> The extension is not on the Chrome Web Store yet. Install it from source for now.
+> The extension is not on the Chrome Web Store yet. Install it from the release zip for now.
 
-1. Download this repository (**Code › Download ZIP**) and unzip it.
+1. Download `taobao-order-export-<version>.zip` from the [latest release](https://github.com/HKmario852/Taobao-Order-Export/releases/latest) and unzip it.
 2. Open `chrome://extensions` (Edge: `edge://extensions`, Brave: `brave://extensions`).
 3. Turn on **Developer mode**, click **Load unpacked** and pick the folder that contains `manifest.json`.
 
@@ -59,18 +59,18 @@ Keep the folder: the browser loads the extension from it. To update, replace the
 2. Click **Export all orders**, next to Taobao's 导出订单 button or at the bottom right.
 3. Choose fields, which orders and the file format, then click **Export**.
 
-The extension clicks "next page" by itself, about 2–4 seconds per page (30 orders a page), then downloads `taobao-orders-<date>.xlsx` or `.json`.
+The extension clicks "next page" by itself, about 2–4 seconds per page (30 orders a page), then downloads `taobao-orders-<date>.xlsx`, `.csv` or `.json`.
 If Taobao shows a slider check, finish it and click **Continue**. **Stop** ends early.
 
 | | Taobao's 导出订单 | This extension |
 | --- | --- | --- |
 | Orders per export | up to 10 pages | all, first *N* pages, or a date range |
-| Formats | Excel | Excel or JSON |
+| Formats | Excel | Excel, CSV or JSON |
 | 2nd+ item of an order | order no., time and shop left blank | always filled in |
 | Amounts | text such as `￥26.80` | numbers |
 | Picture links | no | yes |
 
-The file layouts (Excel sheets and the JSON schema) are described in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md#output-files).
+The file layouts (Excel sheets, CSV columns and the JSON schema) are described in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md#output-files).
 
 ## 🛠️ Build from source
 

@@ -2,13 +2,18 @@
 // The extension never requests data from Taobao on its own (Taobao blocks that as a bot); it only copies
 // what the page already loaded.
 (() => {
+  // Kept so content.js can ask for them again if it starts late; bounded so a long session doesn't grow forever
   const seen = [];
+  const MAX_SEEN = 50;
   const send = (payload) => {
     seen.push(payload);
+    if (seen.length > MAX_SEEN) seen.shift();
     window.postMessage({ __taobaoOrderExport: 'orders', payload }, location.origin);
   };
   window.addEventListener('message', (e) => {
-    if (e.source !== window || !e.data || e.data.__taobaoOrderExport !== 'replay') return;
+    if (e.source !== window || !e.data) return;
+    if (e.data.__taobaoOrderExport === 'clear') seen.length = 0;
+    if (e.data.__taobaoOrderExport !== 'replay') return;
     for (const payload of seen) window.postMessage({ __taobaoOrderExport: 'orders', payload }, location.origin);
   });
 

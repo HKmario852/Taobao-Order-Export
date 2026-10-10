@@ -204,6 +204,15 @@
   "jsonNote": {
     "message": "JSON 会包含全部字段。"
   },
+  "formatCsv": {
+    "message": "CSV"
+  },
+  "csvNote": {
+    "message": "CSV 每件商品一行。用 Excel 打开请选 .xlsx，长订单号才不会变形。"
+  },
+  "pageChanged": {
+    "message": "还有订单未读取，但找不到淘宝的「下一页」按钮。页面可能已改版，请到 GitHub 回报。"
+  },
   "start": {
     "message": "导出"
   },
