@@ -204,6 +204,15 @@
   "jsonNote": {
     "message": "JSON always contains every field."
   },
+  "formatCsv": {
+    "message": "CSV"
+  },
+  "csvNote": {
+    "message": "CSV has one row per item. For Excel, the .xlsx file keeps long order numbers intact."
+  },
+  "pageChanged": {
+    "message": "Couldn't find Taobao's next-page button although more orders remain. The page may have changed; please report it on GitHub."
+  },
   "start": {
     "message": "Export"
   },

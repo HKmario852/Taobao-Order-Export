@@ -204,6 +204,15 @@
   "jsonNote": {
     "message": "JSON 會包含全部欄位。"
   },
+  "formatCsv": {
+    "message": "CSV"
+  },
+  "csvNote": {
+    "message": "CSV 每件商品一行。用 Excel 開啟請揀 .xlsx，長訂單號碼先唔會變形。"
+  },
+  "pageChanged": {
+    "message": "仲有訂單未讀取，但搵唔到淘寶嘅「下一頁」按鈕。頁面可能已改版，請到 GitHub 回報。"
+  },
   "start": {
     "message": "匯出"
   },

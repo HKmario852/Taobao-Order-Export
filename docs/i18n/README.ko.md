@@ -48,9 +48,9 @@
 ## 📥 설치
 
 > [!NOTE]
-> 아직 Chrome 웹 스토어에 등록되지 않았습니다. 당분간 소스에서 설치해 주세요.
+> 아직 Chrome 웹 스토어에 등록되지 않았습니다. 당분간 릴리스의 zip으로 설치해 주세요.
 
-1. 이 저장소를 내려받아(**Code › Download ZIP**) 압축을 풉니다.
+1. [최신 릴리스](https://github.com/HKmario852/Taobao-Order-Export/releases/latest)에서 `taobao-order-export-<버전>.zip`을 내려받아 압축을 풉니다.
 2. `chrome://extensions`를 엽니다(Edge: `edge://extensions`, Brave: `brave://extensions`).
 3. **개발자 모드**를 켜고 **압축해제된 확장 프로그램을 로드합니다**를 눌러 `manifest.json`이 있는 폴더를 선택합니다.
 
@@ -68,7 +68,7 @@
 | | 타오바오 '导出订单' | 이 확장 프로그램 |
 | --- | --- | --- |
 | 한 번에 내보내는 양 | 최대 10페이지 | 전체, 처음 *N* 페이지, 기간 지정 |
-| 형식 | Excel | Excel 또는 JSON |
+| 형식 | Excel | Excel, CSV 또는 JSON |
 | 두 번째 이후 상품 행 | 주문 번호·시간·상점이 비어 있음 | 항상 채워짐 |
 | 금액 | `￥26.80` 같은 텍스트 | 숫자 |
 | 사진 링크 | 없음 | 있음 |
